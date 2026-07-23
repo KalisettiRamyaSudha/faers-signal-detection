@@ -1,6 +1,6 @@
 # FAERS Adverse Event Signal Detection
 
-Anomaly detection pipeline for FDA adverse event safety signal identification using IsolationForest — applied to the publicly available FDA Adverse Event Reporting System (FAERS) database.
+Anomaly detection pipeline for FDA adverse event safety signal identification using IsolationForest applied to the publicly available FDA Adverse Event Reporting System (FAERS) database.
 
 ---
 
@@ -9,11 +9,11 @@ Anomaly detection pipeline for FDA adverse event safety signal identification us
 Pharmacovigilance teams receive thousands of adverse event reports daily. Manually reviewing every report to identify potential safety signals is infeasible. This project builds an ML-driven signal detection system that:
 
 - **Ingests** FAERS quarterly data files (publicly available from FDA) and cleans four linked tables: demographics, drugs, reactions, and outcomes
-- **Engineers features** capturing drug-reaction co-occurrence frequency, outcome severity, and disproportionality statistics — concepts drawn from standard pharmacovigilance signal detection methodology (PRR, ROR)
-- **Detects anomalies** using IsolationForest — reports with unusual drug-reaction combinations and high severity scores are isolated faster, indicating potential safety signals
-- **Tracks experiments** across four model configurations in MLflow — contamination rates, estimator counts, and evaluation metrics logged per run
-- **Serves predictions** via a FastAPI REST endpoint — scores individual reports or batches, returns anomaly score and risk tier (HIGH / MEDIUM / LOW)
-- **Explains signals** using SHAP TreeExplainer — surfaces which features (co-occurrence frequency, severity, disproportionality) drive the anomaly score
+- **Engineers features** capturing drug-reaction co-occurrence frequency, outcome severity, and disproportionality statistics concepts drawn from standard pharmacovigilance signal detection methodology (PRR, ROR)
+- **Detects anomalies** using IsolationForest reports with unusual drug-reaction combinations and high severity scores are isolated faster, indicating potential safety signals
+- **Tracks experiments** across four model configurations in MLflow contamination rates, estimator counts, and evaluation metrics logged per run
+- **Serves predictions** via a FastAPI REST endpoint scores individual reports or batches, returns anomaly score and risk tier (HIGH / MEDIUM / LOW)
+- **Explains signals** using SHAP TreeExplainer surfaces which features (co-occurrence frequency, severity, disproportionality) drive the anomaly score
 
 The IsolationForest approach mirrors the unsupervised anomaly detection pattern used in production pharmacovigilance monitoring systems where ground truth labels are unavailable and the signal-to-noise ratio is low.
 
@@ -150,7 +150,7 @@ Returns model type, configuration, and API version.
 | `outc_severity` | Outcome severity (1=Other → 5=Death) |
 | `max_pair_count` | Co-occurrence count of the most-reported drug-reaction pair |
 | `max_pair_rate` | Pair count normalised by total reports |
-| `max_disprop` | Disproportionality score — unexpected co-occurrence (PRR proxy) |
+| `max_disprop` | Disproportionality score - unexpected co-occurrence (PRR proxy) |
 | `top_drug_freq` | Frequency of the most commonly reported suspect drug |
 | `reac_sev_entropy` | Reaction diversity × severity — high severity + rare reactions = high score |
 | `disprop_x_severity` | Interaction: disproportionality × outcome severity |
@@ -166,13 +166,13 @@ Returns model type, configuration, and API version.
 | high_contam | 0.05 | 100 | 0.83 | 0.69 | 5.0% |
 | subfeature | 0.03 | 100 | 0.82 | 0.68 | 3.0% |
 
-*Metrics computed against planted signal labels in synthetic data. Real FAERS data has no ground truth labels — signals are flagged for expert review.*
+*Metrics computed against planted signal labels in synthetic data. Real FAERS data has no ground truth labels signals are flagged for expert review.*
 
 ---
 
 ## Key Design Decisions
 
-**Why IsolationForest?** Pharmacovigilance signal detection is fundamentally unsupervised — there are no confirmed signal labels in the raw reporting data. IsolationForest is well-suited for high-dimensional data with a small fraction of genuine anomalies, doesn't require class-balanced training data, and produces interpretable continuous anomaly scores.
+**Why IsolationForest?** Pharmacovigilance signal detection is fundamentally unsupervised there are no confirmed signal labels in the raw reporting data. IsolationForest is well-suited for high-dimensional data with a small fraction of genuine anomalies, doesn't require class-balanced training data, and produces interpretable continuous anomaly scores.
 
 **Why disproportionality features?** The core pharmacovigilance signal detection methods (PRR, ROR, BCPNN) all measure whether a drug-reaction pair appears more often than expected by chance. The `max_disprop` feature approximates this without requiring a reference database.
 
